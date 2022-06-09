@@ -2,6 +2,8 @@
 Serializers for the user app.
 
 """
+from abc import ABC
+
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 
@@ -18,7 +20,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             "email",
             "password",
-            "name",
+            "first_name",
+            "last_name",
         )
         # Pass further settings
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}

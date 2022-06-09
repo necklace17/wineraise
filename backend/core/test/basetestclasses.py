@@ -24,7 +24,8 @@ def create_user(**kwargs):
     # Generate user data
     user_data = {
         "email": kwargs["email"],
-        "name": kwargs.get("email", "John Doe"),
+        "first_name": kwargs.get("first_name", "John"),
+        "last_name": kwargs.get("last_name", "Doe"),
     }
     # Create the user
     user = get_user_model().objects.create(**user_data)

@@ -36,7 +36,8 @@ class TestPublicUserAPI(PublicAPITestCase):
         payload = {
             "email": "ilikewine@wine.de",
             "password": "test_password",
-            "name": "Ned Stark",
+            "first_name": "Ned",
+            "last_name": "Stark",
         }
         # Post the payload
         res = self.client.post(CREATE_USER_URL, payload, format="json")
@@ -76,9 +77,7 @@ class TestPublicUserAPI(PublicAPITestCase):
         # Assert 400 BAD REQUEST response
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         # Filter for the user
-        user_exists = (
-            get_user_model().objects.filter(email=payload["email"]).exists()
-        )
+        user_exists = get_user_model().objects.filter(email=payload["email"]).exists()
         # Assert that the query is empty
         self.assertFalse(user_exists)
 
