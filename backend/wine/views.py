@@ -5,6 +5,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from wine.filters import WineFilter
 from wine.models import Wine, Library, Tag
@@ -15,7 +16,7 @@ class BaseWineAppViewSet(viewsets.ModelViewSet):
     """Base View set for wine app."""
 
     # Permission Classes
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
@@ -58,9 +59,7 @@ class LibraryViewSet(BaseWineAppViewSet):
             queryset = queryset.filter(user=self.request.user)
         else:
             # If not, get all visible libraries (mine and all other public)
-            queryset = queryset.filter(
-                Q(user=self.request.user) | Q(public=True)
-            )
+            queryset = queryset.filter(Q(user=self.request.user) | Q(public=True))
         return queryset
 
 
@@ -83,9 +82,7 @@ class TagViewSet(BaseWineAppViewSet):
 
         queryset = super().get_queryset()
         # Check for the assigned only param
-        assigned_only = bool(
-            int(self.request.query_params.get("assigned_only", 0))
-        )
+        assigned_only = bool(int(self.request.query_params.get("assigned_only", 0)))
         if assigned_only:
             # If the param is given, filter for only assigned tags
             queryset = queryset.filter(wines__isnull=False)

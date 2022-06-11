@@ -12,7 +12,7 @@ from core.test.basetestclasses import (
 # Get the create user url as a constant value
 CREATE_USER_URL = reverse("user:create")
 # Get the token url as a constant value
-TOKEN_URL = reverse("user:token")
+TOKEN_URL = reverse("user:token_obtain_pair")
 # Get the me url as a constant value
 ME_URL = reverse("user:me")
 
@@ -96,8 +96,9 @@ class TestPublicUserAPI(PublicAPITestCase):
         res = self.client.post(TOKEN_URL, payload, format="json")
         # Assert that the access is successful
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        # Assert that the token is in the response data
-        self.assertIn("token", res.data)
+        # Assert that necessary JWT fields are in the response
+        for required_field in ["access", "refresh"]:
+            self.assertIn(required_field, res.data)
 
     def test_create_token_invalid_credentials(self):
         """Test that token is not created if invalid credentials are given."""
@@ -110,8 +111,8 @@ class TestPublicUserAPI(PublicAPITestCase):
         }
         # Try to access the token page
         res = self.client.post(TOKEN_URL, payload, format="json")
-        # Check that the response code is BAD REQUEST
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # Check that the response code is HTTP_401_UNAUTHORIZED
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         # Check that the token is not available in the response
         self.assertNotIn("token", res.data)
 
@@ -124,8 +125,8 @@ class TestPublicUserAPI(PublicAPITestCase):
         }
         # Post the payload to the generate token page
         res = self.client.post(TOKEN_URL, payload, format="json")
-        # Check that the response code is BAD REQUEST
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # Check that the response code is HTTP_401_UNAUTHORIZED
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         # Check that the token is not available in the response
         self.assertNotIn("token", res.data)
 
